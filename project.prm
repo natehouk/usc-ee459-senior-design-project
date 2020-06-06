@@ -1,0 +1,40 @@
+/* This is a linker parameter file for the mc68hc908jl16 */
+
+NAMES END /* CodeWarrior will pass all the needed files to the linker by command line. But here you may add your own files too. */
+
+SEGMENTS /* Here all RAM/ROM areas of the device are listed. Used in PLACEMENT below. */
+    Z_RAM                    =  READ_WRITE   0x0060 TO 0x00FF;
+    RAM                      =  READ_WRITE   0x0100 TO 0x025F;
+    ROM0                     =  READ_ONLY    0xBC00 TO 0xBC0F;
+    ROM                      =  READ_ONLY    0xBC10 TO 0xFBFF;
+ /* INTVECTS                 =  READ_ONLY    0xFFDE TO 0xFFFF; Reserved for Interrupt Vectors */
+END
+
+PLACEMENT /* Here all predefined and user segments are placed into the SEGMENTS defined above. */
+    DEFAULT_RAM                         /* non-zero page variables */
+                                        INTO  RAM;
+
+    _PRESTART,                          /* startup code */
+    STARTUP,                            /* startup data structures */
+    ROM_VAR,                            /* constant variables */
+    STRINGS,                            /* string literals */
+    VIRTUAL_TABLE_SEGMENT,              /* C++ virtual table segment */
+    DEFAULT_ROM,
+    COPY                                /* copy down information: how to initialize variables */
+                                        INTO  ROM; 
+
+    MY_ISR_ROM                          INTO  ROM0;
+
+    _DATA_ZEROPAGE,                     /* zero page variables */
+    MY_ZEROPAGE                         INTO  Z_RAM;
+END
+
+
+STACKSIZE 0x50
+
+VECTOR 0 _Startup /* Reset vector: this is the default entry point for an application. */
+VECTOR ADDRESS 0xFFF2 i2c_watchdog
+VECTOR ADDRESS 0xFFF6 dummyISR
+VECTOR ADDRESS 0xFFF8 dummyISR
+VECTOR ADDRESS 0xFFFA dummyISR
+VECTOR ADDRESS 0xFFFC dummyISR
